@@ -1,0 +1,16 @@
+---
+- name: copy .git-completion.bash
+  copy:
+    src=git-completion.bash
+    dest=~/.git-completion.bash
+
+- name: copy .git-prompt.sh
+  copy:
+    src=git-prompt.sh
+    dest=~/.git-prompt.sh
+
+- name: copy .bashrc
+  copy:
+    src=bashrc
+    dest=~/.bashrc
+

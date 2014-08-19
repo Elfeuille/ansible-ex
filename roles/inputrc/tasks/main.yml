@@ -1,0 +1,6 @@
+---
+- name: copy .inputrc
+  copy:
+    src=inputrc
+    dest=~/.inputrc
+

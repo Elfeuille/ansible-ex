@@ -1,0 +1,25 @@
+#!/bin/bash
+SCRIPT_HOME=`echo $(cd $(dirname $0);pwd)`; cd ${SCRIPT_HOME}
+
+classifier=$1
+user=$2
+tags=$3
+
+password_file=~/.ssh/ansible.key
+inventory_dir=inventory/${classifier}
+
+if [ "${classifier}" = "" -o "${user}" = "" ]; then
+	echo "[ERROR] Argument is invalid."
+	echo "  execute {classifier} {user} [tags]"
+	exit 1;
+fi
+
+ansible-vault decrypt ${inventory_dir}/hosts --vault-password-file ${password_file}
+
+if [ "${tags}" != "" ]; then
+	ansible-playbook -i ${inventory_dir} site.yml --extra-vars "classifier=${classifier}" -u ${user} --vault-password-file ${password_file} --tags "${tags}"
+else
+	ansible-playbook -i ${inventory_dir} site.yml --extra-vars "classifier=${classifier}" -u ${user} --vault-password-file ${password_file}
+fi
+
+ansible-vault encrypt ${inventory_dir}/hosts --vault-password-file ${password_file}

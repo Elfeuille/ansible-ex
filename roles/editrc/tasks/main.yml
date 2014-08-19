@@ -1,0 +1,6 @@
+---
+- name: copy .editrc
+  copy:
+    src=editrc
+    dest=~/.editrc
+
