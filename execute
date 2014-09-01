@@ -1,25 +1,100 @@
-#!/bin/bash
-SCRIPT_HOME=`echo $(cd $(dirname $0);pwd)`; cd ${SCRIPT_HOME}
+#!/usr/bin/python
 
-classifier=$1
-user=$2
-tags=$3
+import os
+import pwd
+import argparse
+import json
 
-password_file=~/.ssh/ansible.key
-inventory_dir=inventory/${classifier}
+inventory_root = "./inventory"
+roles_root = "./roles"
+inventory_file = "hosts"
+playbook_default = "site.yml"
+private_key_default = "~/.ssh/ansible.key"
 
-if [ "${classifier}" = "" -o "${user}" = "" ]; then
-	echo "[ERROR] Argument is invalid."
-	echo "  execute {classifier} {user} [tags]"
-	exit 1;
-fi
+class Help:
+	roles = []
+	tags = []
 
-ansible-vault decrypt ${inventory_dir}/hosts --vault-password-file ${password_file}
+	def __init__(self):
+		self.roles = os.listdir(inventory_root)
+		self.tags = os.listdir(roles_root)
 
-if [ "${tags}" != "" ]; then
-	ansible-playbook -i ${inventory_dir} site.yml --extra-vars "classifier=${classifier}" -u ${user} --vault-password-file ${password_file} --tags "${tags}"
-else
-	ansible-playbook -i ${inventory_dir} site.yml --extra-vars "classifier=${classifier}" -u ${user} --vault-password-file ${password_file}
-fi
+	def classifier(self):
+		return "specify classifier. ['" + "', '".join(self.roles) + "']"
 
-ansible-vault encrypt ${inventory_dir}/hosts --vault-password-file ${password_file}
+	def tag(self):
+		return "specify tags. (specify multipul by ',') ['" + "', '".join(self.tags) + "']"
+
+	def user(self):
+		return "specify remote user."
+
+	def playbook(self):
+		return "specify playbook. (default: %(default)s)"
+
+	def key(self):
+		return "specify ansible password file. (default: %(default)s)"
+
+	def sshKey(self):
+		return "specify private key file."
+
+class CommandLine:
+	command = ""
+
+	def __init__(self, command):
+		self.command = command
+
+	def addParam(self, key, value):
+		self.addCommand(" ".join([key, value]))
+
+	def addCommand(self, value):
+		self.command = self.command + " " + value
+
+	def dump(self):
+		print self.command
+
+	def execute(self):
+		return os.system(self.command)
+
+
+if __name__ == '__main__':
+	#	parse arguments
+	help = Help()
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-c", "--classifier", help = help.classifier(), required = True)
+	parser.add_argument("-t", "--tags",       help = help.tag())
+	parser.add_argument("-u", "--user",       help = help.user())
+	parser.add_argument("-s", "--sshkey",     help = help.sshKey())
+	parser.add_argument("-p", "--playbook",   help = help.playbook(), default = playbook_default)
+	parser.add_argument("-k", "--key",        help = help.key(), default = private_key_default)
+	args = parser.parse_args()
+
+	#	decrypt inventory
+	decrypt = CommandLine("ansible-vault")
+	decrypt.addParam("decrypt", "/".join([inventory_root, args.classifier, inventory_file]))
+	decrypt.addParam("--vault-password-file", args.key)
+	decrypt.execute()
+
+	#	execute ansible
+	extra_vars = {}
+	extra_vars["classifier"] = args.classifier
+	if args.user:
+		extra_vars["ansible_ssh_user"] = args.user
+
+	command = CommandLine("ansible-playbook")
+	command.addParam("-i", "/".join([inventory_root, args.classifier]))
+	command.addCommand(args.playbook)
+	command.addParam("--extra-vars", "'" + json.dumps(extra_vars) + "'")
+	command.addParam("--vault-password-file", args.key)
+
+	if args.tags:
+		command.addParam("--tags", args.tags)
+	if args.sshkey:
+		command.addParam("--private-key", args.sshkey)
+	command.execute()
+
+	#	encrypt inventory
+	encrypt = CommandLine("ansible-vault")
+	encrypt.addParam("encrypt", "/".join([inventory_root, args.classifier, inventory_file]))
+	encrypt.addParam("--vault-password-file", args.key)
+	encrypt.execute()
+
