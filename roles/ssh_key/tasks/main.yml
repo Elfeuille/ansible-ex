@@ -9,10 +9,6 @@
   template:
     src=id_rsa.j2
     dest=~/.ssh/id_rsa
-
-- name: change permission id_rsa
-  file:
-    path=~/.ssh/id_rsa
     mode=0600
 
 - name: create authorized_key
