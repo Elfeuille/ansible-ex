@@ -1,0 +1,6 @@
+---
+- name: replace .gitconfig
+  template: 
+    src=gitconfig.{{ ansible_ssh_user }}.j2
+    dest=~/.gitconfig
+

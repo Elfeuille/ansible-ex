@@ -7,4 +7,5 @@
     - { role: editrc,  tags: ["editrc"] }
     - { role: inputrc, tags: ["inputrc"] }
     - { role: ssh_key, tags: ["ssh_key"] }
+    - { role: git,     tags: ["git"] }
 

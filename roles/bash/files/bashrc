@@ -15,7 +15,7 @@ if [ -f $HOME/.git-prompt.sh ]; then
 fi
 
 # User specific aliases and functions
-PS1='\u@\h[$PWD$(__git_ps1)]\$ '
+PS1='\u@\[\e[1;31m\]\h\[\e[00m\][$PWD$(__git_ps1)]\$ '
 set -o vi
 
 alias sudo='sudo -E '
