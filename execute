@@ -1,12 +1,14 @@
 #!/usr/bin/python
 
 import os
+import sys
 import pwd
 import argparse
 import json
 
-inventory_root = "./inventory"
-roles_root = "./roles"
+script_home = os.path.dirname(os.path.abspath(__file__))
+inventory_root = script_home + "/inventory"
+roles_root = script_home + "/roles"
 inventory_file = "hosts"
 playbook_default = "site.yml"
 private_key_default = "~/.ssh/ansible.key"
@@ -82,7 +84,7 @@ if __name__ == '__main__':
 
 	command = CommandLine("ansible-playbook")
 	command.addParam("-i", "/".join([inventory_root, args.classifier]))
-	command.addCommand(args.playbook)
+	command.addCommand(script_home + "/" + args.playbook)
 	command.addParam("--extra-vars", "'" + json.dumps(extra_vars) + "'")
 	command.addParam("--vault-password-file", args.key)
 
