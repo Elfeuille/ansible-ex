@@ -2,15 +2,18 @@
 - name: copy .git-completion.bash
   copy:
     src=git-completion.bash
-    dest=~/.git-completion.bash
+    dest=/home/{{ target_user }}/.git-completion.bash
+    owner="{{ target_user }}"
 
 - name: copy .git-prompt.sh
   copy:
     src=git-prompt.sh
-    dest=~/.git-prompt.sh
+    dest=/home/{{ target_user }}/.git-prompt.sh
+    owner="{{ target_user }}"
 
-- name: copy .bashrc
-  copy:
-    src=bashrc
-    dest=~/.bashrc
+- name: replace .bashrc
+  template:
+    src=bashrc.j2
+    dest=/home/{{ target_user }}/.bashrc
+    owner="{{ target_user }}"
 

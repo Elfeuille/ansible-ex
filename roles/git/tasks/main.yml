@@ -1,6 +1,7 @@
 ---
 - name: replace .gitconfig
   template: 
-    src=gitconfig.{{ ansible_ssh_user }}.j2
-    dest=~/.gitconfig
+    src=gitconfig.{{ target_user }}.j2
+    dest=/home/{{ target_user }}/.gitconfig
+    owner="{{ target_user }}"
 

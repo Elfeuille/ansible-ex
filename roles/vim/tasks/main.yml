@@ -2,5 +2,6 @@
 - name: copy .vimrc
   copy:
     src=vimrc
-    dest=~/.vimrc
+    dest=/home/{{ target_user }}/.vimrc
+    owner="{{ target_user }}"
 

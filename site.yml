@@ -1,11 +1,12 @@
 ---
 - hosts: servers
+  sudo: yes
   gather_facts: yes
   roles:
     - { role: vim,     tags: ["vim"] }
     - { role: bash,    tags: ["bash"] }
     - { role: editrc,  tags: ["editrc"] }
     - { role: inputrc, tags: ["inputrc"] }
-    - { role: ssh_key, tags: ["ssh_key"] }
+#    - { role: ssh_key, tags: ["ssh_key"] }
     - { role: git,     tags: ["git"] }
 

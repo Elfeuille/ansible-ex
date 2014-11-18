@@ -2,5 +2,6 @@
 - name: copy .inputrc
   copy:
     src=inputrc
-    dest=~/.inputrc
+    dest=/home/{{ target_user }}/.inputrc
+    owner="{{ target_user }}"
 

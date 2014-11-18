@@ -1,18 +1,23 @@
 ---
 - name: create ssh dir
   file:
-    path=~/.ssh
+    path=/home/{{ target_user }}/.ssh
     state=directory
     mode=0700
+    owner="{{ target_user }}"
 
 - name: create id_rsa
   template:
     src=id_rsa.j2
-    dest=~/.ssh/id_rsa
+    dest=/home/{{ target_user }}/.ssh/id_rsa
     mode=0600
+    owner="{{ target_user }}"
+  ignore_errors: yes
 
 - name: create authorized_key
   authorized_key:
-    user="{{ ansible_user_id }}"
+    user="{{ target_user }}"
     key="{{ ssh_key_public_key_string }}"
+    path=/home/{{ target_user }}/.ssh/authorized_keys
+  ignore_errors: yes
 

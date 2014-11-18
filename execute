@@ -80,7 +80,7 @@ if __name__ == '__main__':
 	extra_vars = {}
 	extra_vars["classifier"] = args.classifier
 	if args.user:
-		extra_vars["ansible_ssh_user"] = args.user
+		extra_vars["target_user"] = args.user
 
 	command = CommandLine("ansible-playbook")
 	command.addParam("-i", "/".join([inventory_root, args.classifier]))
